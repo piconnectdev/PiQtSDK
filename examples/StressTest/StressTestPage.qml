@@ -328,9 +328,11 @@ ApplicationWindow {
                         visible: true
                         enabled: localWallet.publicAddress === ""
                         text: qsTr("Import Key")
+                        hoverEnabled: true
+                        ToolTip.delay: 1000
                         ToolTip.timeout: 5000
-                        ToolTip.visible: true
-                        ToolTip.text: "Nhập 24 từ ghi nhớ để khởi tạo ví."
+                        ToolTip.visible: hovered
+                        ToolTip.text: qsTr("Nhập 24 từ ghi nhớ để khởi tạo ví.")
                         onClicked: {
                             importDialog.open()
                         }
@@ -341,9 +343,11 @@ ApplicationWindow {
                         enabled: localWallet.publicAddress !== ""
                                  && !localWallet.funded
                         text: qsTr("Check Account")
+                        hoverEnabled: true
+                        ToolTip.delay: 1000
                         ToolTip.timeout: 5000
-                        ToolTip.visible: true
-                        ToolTip.text: "Kiểm tra số dư tài khoản nguồn trước khi gửi."
+                        ToolTip.visible: hovered
+                        ToolTip.text: qsTr("Kiểm tra số dư tài khoản nguồn trước khi gửi.")
                         onClicked: {
                             localWallet.fund()
                         }

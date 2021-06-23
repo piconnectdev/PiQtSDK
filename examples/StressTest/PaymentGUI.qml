@@ -24,9 +24,11 @@ ColumnLayout {
         Button {
             text: qsTr("start")
             enabled: true
+            hoverEnabled: true
+            ToolTip.delay: 1000
             ToolTip.timeout: 5000
-            ToolTip.visible: true
-            ToolTip.text: "Bắt đầu gửi tự động."
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Bắt đầu gửi tự động.")
             onClicked: {
                 //aymentGui.enabled=false;// pay and create if fails, it emit error and invokes onError synchronized, so we have to disable it before.
                 //signals and slots are invoked in the same moment if the objects live in the same thread and you don't defer the signal by using a timer.
@@ -39,9 +41,11 @@ ColumnLayout {
             text: qsTr("stop")
             enabled: true
             visible: true
+            hoverEnabled: true
+            ToolTip.delay: 1000
             ToolTip.timeout: 5000
-            ToolTip.visible: true
-            ToolTip.text: "Chấm dứt gửi tự động."
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Chấm dứt gửi tự động.")
             onClicked: {
                 //paymentGui.enabled=false;// pay and create if fails, it emit error and invokes onError synchronized, so we have to disable it before.
                 //signals and slots are invoked in the same moment if the objects live in the same thread and you don't defer the signal by using a timer.
@@ -50,11 +54,13 @@ ColumnLayout {
         }
         Button {
             text: qsTr("Pay")
-            enabled: fundedTarget
-            visible: false
+            enabled: destinationField.text !== ""
+            visible: true
+            hoverEnabled: true
+            ToolTip.delay: 1000
             ToolTip.timeout: 5000
-            ToolTip.visible: true
-            ToolTip.text: "Chỉ gửi một lần."
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Chỉ gửi một lần.")
             onClicked: {
                 paymentGui.enabled = false // pay and create if fails, it emit error and invokes onError synchronized, so we have to disable it before.
                 //signals and slots are invoked in the same moment if the objects live in the same thread and you don't defer the signal by using a timer.
