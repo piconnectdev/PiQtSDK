@@ -51,10 +51,15 @@ void Wallet::import(const QString& words)
         auto splits = words.split(" ");
         if (splits.size() != 24)\
             return;
-        QByteArray seeds = Util::mnemonicToBIP39Seed(words, "");
-        m_account = new Account(KeyPair::fromBip39Seed(seeds,314159,0), 0);
-        //we just created m_keypair, it changes publicAddress property and we want to notify everybody about it
-        emit publicAddressChanged();
+        try {
+            QByteArray seeds = Util::mnemonicToBIP39Seed(words, "");
+            m_account = new Account(KeyPair::fromBip39Seed(seeds,314159,0), 0);
+            //we just created m_keypair, it changes publicAddress property and we want to notify everybody about it
+            emit publicAddressChanged();
+        }
+        catch(...) {
+
+        }
     }
 }
 
