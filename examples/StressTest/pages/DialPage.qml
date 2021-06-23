@@ -48,49 +48,27 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QSettings>
-#include <QQuickStyle>
-#include <QIcon>
+import QtQuick 2.12
+import QtQuick.Controls 2.12
 
-#include "stellargateway.h"
-#include "wallet.h"
+ScrollablePage {
+    id: page
 
-int main(int argc, char *argv[])
-{
-    QGuiApplication::setApplicationName("StressTest");
-    QGuiApplication::setOrganizationName("PiConnect");
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    Column {
+        spacing: 40
+        width: parent.width
 
-    QGuiApplication app(argc, argv);
+        Label {
+            width: parent.width
+            wrapMode: Label.Wrap
+            horizontalAlignment: Qt.AlignHCenter
+            text: "The Dial is similar to a traditional dial knob that is found on devices such as "
+                + "stereos or industrial equipment. It allows the user to specify a value within a range."
+        }
 
-    qmlRegisterType<StellarGateway>("StressTest",2,0, "StellarGateway");
-    qmlRegisterType<Wallet>("StressTest",2,0, "Wallet");
-
-    QIcon::setThemeName("gallery");
-
-    QSettings settings;
-//    QString styleSet = settings.value("style").toString();
-//    QString style = QQuickStyle::name();
-//    if (!style.isEmpty())
-//        settings.setValue("style", style);
-//    else
-//        QQuickStyle::setStyle(settings.value("style").toString());
-    QQuickStyle::setStyle("Material");
-    QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("qrc:/StressTestPage.qml"));
-    engine.rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
-    //connection that exits application with -1 if there is a problem loading main.qml
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
-    if (engine.rootObjects().isEmpty())
-        return -1;
-
-    return app.exec();
+        Dial {
+            value: 0.5
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+    }
 }

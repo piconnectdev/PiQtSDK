@@ -48,49 +48,50 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QSettings>
-#include <QQuickStyle>
-#include <QIcon>
+import QtQuick 2.12
+import QtQuick.Controls 2.12
 
-#include "stellargateway.h"
-#include "wallet.h"
+ScrollablePage {
+    id: page
 
-int main(int argc, char *argv[])
-{
-    QGuiApplication::setApplicationName("StressTest");
-    QGuiApplication::setOrganizationName("PiConnect");
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    Column {
+        spacing: 40
+        width: parent.width
 
-    QGuiApplication app(argc, argv);
+        Label {
+            width: parent.width
+            wrapMode: Label.Wrap
+            horizontalAlignment: Qt.AlignHCenter
+            text: "ComboBox is a combined button and popup list. It presents "
+                + "a list of options to the user that occupies minimal screen space."
+        }
 
-    qmlRegisterType<StellarGateway>("StressTest",2,0, "StellarGateway");
-    qmlRegisterType<Wallet>("StressTest",2,0, "Wallet");
+        ComboBox {
+            model: ["First", "Second", "Third"]
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
 
-    QIcon::setThemeName("gallery");
+        Label {
+            width: parent.width
+            wrapMode: Label.Wrap
+            horizontalAlignment: Qt.AlignHCenter
+            text: "ComboBox can be made \l editable. An editable combo box auto-"
+                + "completes its text based on what is available in the model."
+        }
 
-    QSettings settings;
-//    QString styleSet = settings.value("style").toString();
-//    QString style = QQuickStyle::name();
-//    if (!style.isEmpty())
-//        settings.setValue("style", style);
-//    else
-//        QQuickStyle::setStyle(settings.value("style").toString());
-    QQuickStyle::setStyle("Material");
-    QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("qrc:/StressTestPage.qml"));
-    engine.rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
-    //connection that exits application with -1 if there is a problem loading main.qml
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
-    if (engine.rootObjects().isEmpty())
-        return -1;
-
-    return app.exec();
+        ComboBox {
+            editable: true
+            model: ListModel {
+                id: model
+                ListElement { text: "Banana" }
+                ListElement { text: "Apple" }
+                ListElement { text: "Coconut" }
+            }
+            onAccepted: {
+                if (find(editText) === -1)
+                    model.append({text: editText})
+            }
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+    }
 }

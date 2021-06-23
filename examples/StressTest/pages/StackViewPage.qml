@@ -48,49 +48,49 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QSettings>
-#include <QQuickStyle>
-#include <QIcon>
+import QtQuick 2.12
+import QtQuick.Controls 2.12
 
-#include "stellargateway.h"
-#include "wallet.h"
+StackView {
+    id: stackView
+    initialItem: page
 
-int main(int argc, char *argv[])
-{
-    QGuiApplication::setApplicationName("StressTest");
-    QGuiApplication::setOrganizationName("PiConnect");
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    Component {
+        id: page
 
-    QGuiApplication app(argc, argv);
+        Pane {
+            id: pane
+            width: parent ? parent.width : 0 // TODO: fix null parent on destruction
 
-    qmlRegisterType<StellarGateway>("StressTest",2,0, "StellarGateway");
-    qmlRegisterType<Wallet>("StressTest",2,0, "Wallet");
+            Column {
+                spacing: 40
+                width: parent.width
 
-    QIcon::setThemeName("gallery");
+                Label {
+                    width: parent.width
+                    wrapMode: Label.Wrap
+                    horizontalAlignment: Qt.AlignHCenter
+                    text: "StackView provides a stack-based navigation model which can be used with a set of interlinked pages. "
+                    + "Items are pushed onto the stack as the user navigates deeper into the material, and popped off again "
+                    + "when he chooses to go back."
+                }
 
-    QSettings settings;
-//    QString styleSet = settings.value("style").toString();
-//    QString style = QQuickStyle::name();
-//    if (!style.isEmpty())
-//        settings.setValue("style", style);
-//    else
-//        QQuickStyle::setStyle(settings.value("style").toString());
-    QQuickStyle::setStyle("Material");
-    QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("qrc:/StressTestPage.qml"));
-    engine.rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
-    //connection that exits application with -1 if there is a problem loading main.qml
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
-    if (engine.rootObjects().isEmpty())
-        return -1;
+                Button {
+                    id: button
+                    text: "Push"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: Math.max(button.implicitWidth, Math.min(button.implicitWidth * 2, pane.availableWidth / 3))
+                    onClicked: stackView.push(page)
+                }
 
-    return app.exec();
+                Button {
+                    text: "Pop"
+                    enabled: stackView.depth > 1
+                    width: Math.max(button.implicitWidth, Math.min(button.implicitWidth * 2, pane.availableWidth / 3))
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onClicked: stackView.pop()
+                }
+            }
+        }
+    }
 }

@@ -48,49 +48,49 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QSettings>
-#include <QQuickStyle>
-#include <QIcon>
+import QtQuick 2.12
+import QtQuick.Controls 2.12
 
-#include "stellargateway.h"
-#include "wallet.h"
+Pane {
+    id: pane
 
-int main(int argc, char *argv[])
-{
-    QGuiApplication::setApplicationName("StressTest");
-    QGuiApplication::setOrganizationName("PiConnect");
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    SwipeView {
+        id: view
+        currentIndex: 1
+        anchors.fill: parent
 
-    QGuiApplication app(argc, argv);
+        Repeater {
+            model: 3
 
-    qmlRegisterType<StellarGateway>("StressTest",2,0, "StellarGateway");
-    qmlRegisterType<Wallet>("StressTest",2,0, "Wallet");
+            Pane {
+                width: view.width
+                height: view.height
 
-    QIcon::setThemeName("gallery");
+                Column {
+                    spacing: 40
+                    width: parent.width
 
-    QSettings settings;
-//    QString styleSet = settings.value("style").toString();
-//    QString style = QQuickStyle::name();
-//    if (!style.isEmpty())
-//        settings.setValue("style", style);
-//    else
-//        QQuickStyle::setStyle(settings.value("style").toString());
-    QQuickStyle::setStyle("Material");
-    QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("qrc:/StressTestPage.qml"));
-    engine.rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
-    //connection that exits application with -1 if there is a problem loading main.qml
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
-    if (engine.rootObjects().isEmpty())
-        return -1;
+                    Label {
+                        width: parent.width
+                        wrapMode: Label.Wrap
+                        horizontalAlignment: Qt.AlignHCenter
+                        text: "SwipeView provides a navigation model that simplifies horizontal paged scrolling. "
+                        + "The page indicator on the bottom shows which is the presently active page."
+                    }
 
-    return app.exec();
+                    Image {
+                        source: "../images/arrows.png"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
+        }
+    }
+
+    PageIndicator {
+        count: view.count
+        currentIndex: view.currentIndex
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
 }

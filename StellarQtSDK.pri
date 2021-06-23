@@ -15,8 +15,6 @@ DEFINES += STELLAR_QT_SDK_CLIENT_VERSION=\"\\\"0.3.6\\\"\"
 QT *= core network
 CONFIG *= c++11
 
-TEMPLATE = app
-
 INCLUDEPATH *=  $$PWD
 INCLUDEPATH *=  $$PWD/src/
 

@@ -48,49 +48,48 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QSettings>
-#include <QQuickStyle>
-#include <QIcon>
+import QtQuick 2.12
+import QtQuick.Controls 2.12
 
-#include "stellargateway.h"
-#include "wallet.h"
+ScrollablePage {
+    id: page
 
-int main(int argc, char *argv[])
-{
-    QGuiApplication::setApplicationName("StressTest");
-    QGuiApplication::setOrganizationName("PiConnect");
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    readonly property int itemWidth: Math.max(button.implicitWidth, Math.min(button.implicitWidth * 3, page.availableWidth / 3 * 2))
 
-    QGuiApplication app(argc, argv);
+    Column {
+        spacing: 40
+        width: parent.width
 
-    qmlRegisterType<StellarGateway>("StressTest",2,0, "StellarGateway");
-    qmlRegisterType<Wallet>("StressTest",2,0, "Wallet");
+        Label {
+            width: parent.width
+            wrapMode: Label.Wrap
+            horizontalAlignment: Qt.AlignHCenter
+            text: "A GroupBox provides a frame, a title on top of it, and a logical group of controls within that frame."
+        }
 
-    QIcon::setThemeName("gallery");
+        GroupBox {
+            title: "Title"
+            anchors.horizontalCenter: parent.horizontalCenter
 
-    QSettings settings;
-//    QString styleSet = settings.value("style").toString();
-//    QString style = QQuickStyle::name();
-//    if (!style.isEmpty())
-//        settings.setValue("style", style);
-//    else
-//        QQuickStyle::setStyle(settings.value("style").toString());
-    QQuickStyle::setStyle("Material");
-    QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("qrc:/StressTestPage.qml"));
-    engine.rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
-    //connection that exits application with -1 if there is a problem loading main.qml
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
-    if (engine.rootObjects().isEmpty())
-        return -1;
+            Column {
+                spacing: 20
+                width: page.itemWidth
 
-    return app.exec();
+                RadioButton {
+                    text: "First"
+                    checked: true
+                    width: parent.width
+                }
+                RadioButton {
+                    id: button
+                    text: "Second"
+                    width: parent.width
+                }
+                RadioButton {
+                    text: "Third"
+                    width: parent.width
+                }
+            }
+        }
+    }
 }

@@ -48,49 +48,40 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QSettings>
-#include <QQuickStyle>
-#include <QIcon>
+import QtQuick 2.12
+import QtQuick.Controls 2.12
 
-#include "stellargateway.h"
-#include "wallet.h"
+Flickable {
+    id: flickable
 
-int main(int argc, char *argv[])
-{
-    QGuiApplication::setApplicationName("StressTest");
-    QGuiApplication::setOrganizationName("PiConnect");
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    contentHeight: pane.height
 
-    QGuiApplication app(argc, argv);
+    Pane {
+        id: pane
+        width: flickable.width
+        height: flickable.height * 1.25
 
-    qmlRegisterType<StellarGateway>("StressTest",2,0, "StellarGateway");
-    qmlRegisterType<Wallet>("StressTest",2,0, "Wallet");
+        Column {
+            id: column
+            spacing: 40
+            width: parent.width
 
-    QIcon::setThemeName("gallery");
+            Label {
+                width: parent.width
+                wrapMode: Label.Wrap
+                horizontalAlignment: Qt.AlignHCenter
+                text: "ScrollBar is an interactive bar that can be used to scroll to a specific position. "
+                    + "A scroll bar can be either vertical or horizontal, and can be attached to any Flickable, "
+                    + "such as ListView and GridView."
+            }
 
-    QSettings settings;
-//    QString styleSet = settings.value("style").toString();
-//    QString style = QQuickStyle::name();
-//    if (!style.isEmpty())
-//        settings.setValue("style", style);
-//    else
-//        QQuickStyle::setStyle(settings.value("style").toString());
-    QQuickStyle::setStyle("Material");
-    QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("qrc:/StressTestPage.qml"));
-    engine.rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
-    //connection that exits application with -1 if there is a problem loading main.qml
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
-    if (engine.rootObjects().isEmpty())
-        return -1;
+            Image {
+                rotation: 90
+                source: "../images/arrows.png"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+    }
 
-    return app.exec();
+    ScrollBar.vertical: ScrollBar { }
 }
