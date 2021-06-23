@@ -106,9 +106,12 @@ KeyPair *KeyPair::fromPublicKey(QByteArray publicKey) {
 }
 
 KeyPair *KeyPair::fromBip39Seed(QByteArray bip39Seed, int accountNumber) {
-    return KeyPair::fromSecretSeed(SLIP10::deriveEd25519PrivateKey(bip39Seed, QVector<int>()<< 44<< 148<< accountNumber));
+    return KeyPair::fromSecretSeed(SLIP10::deriveEd25519PrivateKey(bip39Seed, QVector<int>()<< 44<< 314159<< accountNumber));
 }
 
+KeyPair *KeyPair::fromBip39Seed(QByteArray bip39Seed, int chainId, int accountNumber) {
+    return KeyPair::fromSecretSeed(SLIP10::deriveEd25519PrivateKey(bip39Seed, QVector<int>()<< 44<< chainId<< accountNumber));
+}
 
 KeyPair *KeyPair::random() {
     QByteArray seed;
