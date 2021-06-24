@@ -498,18 +498,17 @@ ApplicationWindow {
 
             Label {
                 width: aboutDialog.availableWidth
+                text: "Chúng tôi không chịu bất kỳ trách nhiệm nào với người sử dụng chương trình này, " + "bao gồm có thể bị PCT khóa, "
+                      + "xóa tài khoản Pi Network." + " Chúng tôi không thu thập, lưu trữ khóa 24 từ bảo mật của người dùng."
+                wrapMode: Label.Wrap
+                font.pixelSize: 12
+            }
+            Label {
+                width: aboutDialog.availableWidth
                 text: "Contact: piconnectdev@gmail.com"
                 wrapMode: Label.Wrap
                 font.pixelSize: 12
             }
-
-            /*Label {
-                width: aboutDialog.availableWidth
-                text: "In comparison to the desktop-oriented Qt Quick Controls 1, Qt Quick Controls 2 " + "are an order of magnitude simpler, lighter and faster, and are primarily targeted "
-                      + "towards embedded and mobile platforms."
-                wrapMode: Label.Wrap
-                font.pixelSize: 12
-            }*/
         }
     }
 }

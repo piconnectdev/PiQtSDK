@@ -132,15 +132,18 @@ void Wallet::startPay(int interval, QString destination, QString amount, QString
     _totalSuccess = 0;
     _totalError = 0;
     _autoPay = true;
+    _indexDest = 0;
     //_destination = destination;
-    if (interval <= 10 || interval >= 300) {
-        _interval = 30;
+    if (interval < 5 || interval >= 300) {
+        _interval = 5;
     } else {
         _interval = interval;
     }
     _amount = amount;
-    if(_amount.toInt() <= 0) {
-        _amount = "0.001";
+    bool ok = false;
+    double value = _amount.toDouble(&ok);
+    if( value < 0.0 || !ok) {
+        _amount = "0.0001";
     }
     _memo = memo;
     _destinations.clear();
@@ -159,6 +162,7 @@ void Wallet::startPay(int interval, QString destination, QString amount, QString
         }
     }
     if (_destinations.size() > 0) {
+        _isWorking = true;
         pay(_destinations.at(0), _amount, _memo);
     }
     emit stateChanged();
@@ -166,7 +170,9 @@ void Wallet::startPay(int interval, QString destination, QString amount, QString
 
 void Wallet::stopPay()
 {
+    _isWorking = false;
     _autoPay = false;
+    emit stateChanged();
 }
 
 void Wallet::create(QString destination, QString amount, QString memo)
@@ -274,10 +280,11 @@ void Wallet::timerEvent(QTimerEvent *event)
         quint64 now = QDateTime::currentMSecsSinceEpoch();
         if ((now - _lastPay) > _interval*1000) {
             if (_destinations.size() > 0) {
-                _destination = _destinations.at(QRandomGenerator::system()->generate()%_destinations.size());
+                _indexDest++;
+                _destination = _destinations.at(_indexDest%_destinations.size());
+                pay(_destination, _amount, _memo);
+                _lastPay = now;
             }
-            pay(_destination, _amount, _memo);
-            _lastPay = now;
         }
     }
 }

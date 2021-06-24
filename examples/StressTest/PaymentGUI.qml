@@ -23,7 +23,7 @@ ColumnLayout {
 //        }
         Button {
             text: qsTr("start")
-            enabled: true
+            enabled: destinationField.text !== "" && sourceWallet.funded && !sourceWallet.isWorking
             hoverEnabled: true
             ToolTip.delay: 1000
             ToolTip.timeout: 5000
@@ -39,7 +39,7 @@ ColumnLayout {
         }
         Button {
             text: qsTr("stop")
-            enabled: true
+            enabled: sourceWallet.isWorking
             visible: true
             hoverEnabled: true
             ToolTip.delay: 1000
@@ -54,7 +54,7 @@ ColumnLayout {
         }
         Button {
             text: qsTr("Pay")
-            enabled: destinationField.text !== ""
+            enabled: destinationField.text !== "" && sourceWallet.funded && !sourceWallet.isWorking
             visible: true
             hoverEnabled: true
             ToolTip.delay: 1000

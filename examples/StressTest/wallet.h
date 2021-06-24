@@ -39,6 +39,7 @@ public:
     int _totalPay = 0;
     int _totalSuccess = 0;
     int _totalError = 0;
+    int _indexDest = 0;
 
     bool _autoPay = false;
     bool _isWorking = false;
