@@ -40,11 +40,23 @@ stellar::Operation::Operation(const stellar::Operation &op){
     case OperationType::PATH_PAYMENT_STRICT_SEND:
         new (&operationPathPaymentStrictSend) PathPaymentStrictSendOp();
         operationPathPaymentStrictSend = op.operationPathPaymentStrictSend; break;
+    case OperationType::CREATE_CLAIMABLE_BALANCE:
+        operationCreateClaimableBalance = op.operationCreateClaimableBalance; break;
+    case OperationType::CLAIM_CLAIMABLE_BALANCE:
+        operationClaimClaimableBalance = op.operationClaimClaimableBalance; break;
+    case OperationType::BEGIN_SPONSORING_FUTURE_RESERVES:
+        operationBeginSponsoringFutureReserves = op.operationBeginSponsoringFutureReserves; break;
+//    case OperationType::END_SPONSORING_FUTURE_RESERVES:
+//        break;
+    case OperationType::REVOKE_SPONSORSHIP:
+        new (&operationRevokeSponsorship) RevokeSponsorshipOp();
+        operationRevokeSponsorship = op.operationRevokeSponsorship; break;
     default: break;
     }
 }
 
-stellar::Operation::~Operation(){
+void stellar::Operation::clear()
+{
     switch(type)
     {
     case OperationType::PATH_PAYMENT_STRICT_RECEIVE:
@@ -58,30 +70,21 @@ stellar::Operation::~Operation(){
         break;
     case OperationType::PATH_PAYMENT_STRICT_SEND:
         operationPathPaymentStrictSend.~PathPaymentStrictSendOp();
+        break;
+    case OperationType::REVOKE_SPONSORSHIP:
+        operationRevokeSponsorship.~RevokeSponsorshipOp();
         break;
     default:
         break;
     }
 }
 
+stellar::Operation::~Operation(){
+    clear();
+}
+
 const stellar::Operation &stellar::Operation::operator =(const stellar::Operation &op) {
-    switch(type)
-    {
-    case OperationType::PATH_PAYMENT_STRICT_RECEIVE:
-        operationPathPaymentStrictReceive.~PathPaymentStrictReceiveOp();
-        break;
-    case OperationType::SET_OPTIONS:
-        operationSetOptions.~SetOptionsOp();
-        break;
-    case OperationType::MANAGE_DATA:
-        operationManageData.~ManageDataOp();
-        break;
-    case OperationType::PATH_PAYMENT_STRICT_SEND:
-        operationPathPaymentStrictSend.~PathPaymentStrictSendOp();
-        break;
-    default:
-        break;
-    }
+    clear();
     sourceAccount = op.sourceAccount;
     type = op.type;
     switch(op.type){
@@ -117,9 +120,75 @@ const stellar::Operation &stellar::Operation::operator =(const stellar::Operatio
     case OperationType::PATH_PAYMENT_STRICT_SEND:
         new (&operationPathPaymentStrictSend) PathPaymentStrictSendOp();
         operationPathPaymentStrictSend = op.operationPathPaymentStrictSend; break;
+    case OperationType::CREATE_CLAIMABLE_BALANCE:
+        operationCreateClaimableBalance = op.operationCreateClaimableBalance; break;
+    case OperationType::CLAIM_CLAIMABLE_BALANCE:
+        operationClaimClaimableBalance = op.operationClaimClaimableBalance; break;
+    case OperationType::BEGIN_SPONSORING_FUTURE_RESERVES:
+        operationBeginSponsoringFutureReserves = op.operationBeginSponsoringFutureReserves; break;
+//    case OperationType::END_SPONSORING_FUTURE_RESERVES:
+//        break;
+    case OperationType::REVOKE_SPONSORSHIP:
+        new (&operationRevokeSponsorship) RevokeSponsorshipOp();
+        operationRevokeSponsorship = op.operationRevokeSponsorship; break;
     default: break;
     }
     return *this;
+}
+
+stellar::PathPaymentStrictReceiveOp &stellar::Operation::fillPathPaymentStrictReceiveOp()
+{
+    if(type!=OperationType::PATH_PAYMENT_STRICT_RECEIVE)
+    {
+        clear();
+        type=OperationType::PATH_PAYMENT_STRICT_RECEIVE;
+        new (&operationPathPaymentStrictReceive) PathPaymentStrictReceiveOp();
+    }
+    return operationPathPaymentStrictReceive;
+}
+
+stellar::SetOptionsOp &stellar::Operation::fillSetOptionsOp()
+{
+    if(type!=OperationType::SET_OPTIONS)
+    {
+        clear();
+        type=OperationType::SET_OPTIONS;
+        new (&operationSetOptions) SetOptionsOp();
+    }
+    return operationSetOptions;
+}
+
+stellar::ManageDataOp &stellar::Operation::fillManageDataOp()
+{
+    if(type!=OperationType::MANAGE_DATA)
+    {
+        clear();
+        type=OperationType::MANAGE_DATA;
+        new (&operationManageData) ManageDataOp();
+    }
+    return operationManageData;
+}
+
+stellar::PathPaymentStrictSendOp &stellar::Operation::fillPathPaymentStrictSendOp()
+{
+    if(type!=OperationType::PATH_PAYMENT_STRICT_SEND)
+    {
+        clear();
+        type=OperationType::PATH_PAYMENT_STRICT_SEND;
+        new (&operationPathPaymentStrictSend) PathPaymentStrictSendOp();
+    }
+    return operationPathPaymentStrictSend;
+}
+
+stellar::RevokeSponsorshipOp &stellar::Operation::fillRevokeSponsorshipOp()
+{
+    if(type!=OperationType::REVOKE_SPONSORSHIP)
+    {
+        clear();
+        type=OperationType::REVOKE_SPONSORSHIP;
+        new (&operationRevokeSponsorship) RevokeSponsorshipOp();
+    }
+    return operationRevokeSponsorship;
 }
 
 stellar::OperationResult::OperationResult():type(OperationType::CREATE_ACCOUNT)

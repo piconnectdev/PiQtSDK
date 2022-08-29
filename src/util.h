@@ -5,6 +5,9 @@
 #include <QList>
 #include <QRegularExpression>
 #include "xdr/stellartransaction.h"
+
+class Asset;
+class AssetTypeCreditAlphaNum;
 QString checkNotNull(QString p, const char* error);
 QByteArray checkNotNull(QByteArray p, const char* error);
 
@@ -86,7 +89,11 @@ public:
     static QByteArray mnemonicToBIP39Seed(QString words, QString passphrase=QString(""));
 
 
+    static void claimableBalanceIdToXDR(QString balanceID, stellar::ClaimableBalanceID& balanceIdToFill);
 
+    static QString xdrToClaimableBalanceId(stellar::ClaimableBalanceID& balanceId);
+
+    static AssetTypeCreditAlphaNum* assertNonNativeAsset(Asset* asset);
 
 };
 
@@ -154,7 +161,6 @@ struct get_power_s<A, 0, T>
 
 
 qint64 get_power(quint32 a, quint32 b);
-
 
 
 
