@@ -58,6 +58,7 @@ public slots:
     void stopPay();
     void create(QString destination, QString amount, QString memo);
     void import(const QString& words);
+    void claim();
     void setPublicAddress(QString publicAddress);
 
 signals:

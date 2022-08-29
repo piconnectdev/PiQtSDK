@@ -2,14 +2,15 @@
 #include "network.h"
 
 StellarGateway::StellarGateway(QObject *parent) : QObject(parent)
-  , m_server(new Server("https://api.testnet.minepi.com/"))
+  , m_server(new Server("https://api.mainnet.minepi.com"))
 {
     m_servers.push_back(m_server);
-    Network::useTestNetwork();//our example only works on test network
+    //Network::useTestNetwork();//our example only works on test network
+    Network::usePublicNetwork();
 }
 
 StellarGateway::StellarGateway(QList<QString> urls, QObject *parent)
-    : QObject(parent), m_server(new Server("https://api.testnet.minepi.com/"))
+    : QObject(parent), m_server(new Server("https://api.mainnet.minepi.com"))
 {
     m_servers.push_back(m_server);
     for(int i = 0; i < urls.size(); i++) {

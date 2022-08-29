@@ -2,7 +2,9 @@
 #include "transaction.h"
 #include "paymentoperation.h"
 #include "createaccountoperation.h"
+#include "claimclaimablebalanceoperation.h"
 #include "responses/submittransactionresponse.h"
+#include "responses/claimablebalanceresponse.h"
 
 Wallet::Wallet(QObject *parent) : QObject(parent)
   , m_gateway(nullptr)
@@ -73,6 +75,7 @@ void Wallet::fund()
         //here we connect the signal ready of the response to a private slot, that will be executed as soon response is ready
         connect(accountCheckResponse,&AccountResponse::ready
                 ,this,&Wallet::processAccountCheckResponse);
+        //claim();
     }
 #else
     if(m_account && m_gateway){
@@ -82,6 +85,51 @@ void Wallet::fund()
         connect(reply, &QNetworkReply::finished, reply, &QObject::deleteLater);//we don't manage errors, it is an example!
     }
 #endif
+}
+void Wallet::claim()
+{
+    Page<ClaimableBalanceResponse> * claimableCheckResponse = m_gateway->server()->claimableBalances().forClaimant(m_account->getKeypair()->getAccountId()).execute();
+    connect(claimableCheckResponse,&Page<ClaimableBalanceResponse>::ready
+            ,[=]() {
+        Page<ClaimableBalanceResponse> *page = static_cast<Page<ClaimableBalanceResponse>*>(sender());
+        page = claimableCheckResponse;
+        if (page != nullptr) {
+            for (auto idx = 0; idx < page->size(); idx++) {
+                auto clm = page->at(idx);
+                auto claimants = clm->getClaimants();
+                qDebug() << clm->getSponsor() << clm->getAmount();
+                qDebug() << clm->getID() << clm->getAssetString();
+                qDebug() << clm->getLastModifiedLedger() << clm->getLastModifiedTime();
+                for (auto cidx = 0; cidx < claimants.size(); cidx++) {
+                    auto claimant = claimants.at(cidx);
+                    qDebug() << claimant.getDestination() ;
+                    if(claimant.getDestination() == m_account->getKeypair()->getAccountId()) {
+                        Predicate::Not* pre = (Predicate::Not*)(&claimant.getPredicate());
+                        Predicate::AbsBefore* bef = (Predicate::AbsBefore*)&pre->getInner();
+                        qDebug() << bef->getTimestampSeconds();
+                        if (QDateTime::currentSecsSinceEpoch() > bef->getTimestampSeconds()-10) {
+                            Transaction *t = Transaction::Builder(m_account)
+                                    .addOperation((new ClaimClaimableBalanceOperation(clm->getID()))->setSourceAccount(m_account->getKeypair()->getAccountId()))
+                                    //.addMemo(new MemoText(memo))
+                                    .setTimeout(10000)// we have to set a timeout
+                                    .setBaseFee(100000)
+                                    .build();
+                            t->sign(m_account->getKeypair());
+                            Server *server= m_gateway->server();
+                            SubmitTransactionResponse* response = server->submitTransaction(t);
+                            connect(response, &SubmitTransactionResponse::ready, [=]() {
+
+                            });
+                            connect(response, &SubmitTransactionResponse::error, [=]() {
+
+                            });
+                        }
+                    }
+                }
+                qDebug() << "";
+            }
+        }
+    });
 }
 
 void Wallet::update()
@@ -93,6 +141,12 @@ void Wallet::update()
         //here we connect the signal ready of the response to a private slot, that will be executed as soon response is ready
         connect(accountCheckResponse,&AccountResponse::ready
                 ,this,&Wallet::processAccountCheckResponse);
+
+        Page<ClaimableBalanceResponse> * claimableCheckResponse = m_gateway->server()->claimableBalances().forClaimant(m_account->getKeypair()->getAccountId()).execute();
+        connect(claimableCheckResponse,&Page<ClaimableBalanceResponse>::ready
+                ,[=]() {
+            Page<ClaimableBalanceResponse> *page = static_cast<Page<ClaimableBalanceResponse>*>(sender());
+        });
     }
 }
 
@@ -128,6 +182,7 @@ void Wallet::pay(QString destination, QString amount, QString memo)
 
 void Wallet::startPay(int interval, QString destination, QString amount, QString memo)
 {
+    return;
     _totalPay = 0;
     _totalSuccess = 0;
     _totalError = 0;
@@ -170,6 +225,7 @@ void Wallet::startPay(int interval, QString destination, QString amount, QString
 
 void Wallet::stopPay()
 {
+    return;
     _isWorking = false;
     _autoPay = false;
     emit stateChanged();
@@ -179,16 +235,16 @@ void Wallet::create(QString destination, QString amount, QString memo)
 {
     try {
         //verify the destination account is valid, building a keypair object, exception will be rised if there is a problem with it.
-        //KeyPair* destKeypair = KeyPair::fromAccountId(destination);
+        KeyPair* destKeypair = KeyPair::fromAccountId(destination);
         //since protocol 13, this check is performed inside operator constructors, it will rise a runtime exception
 
         Server *server= m_gateway->server();
 
         Transaction *t = Transaction::Builder(m_account)
-                .addOperation(new CreateAccountOperation(destination,amount))
+                .addOperation((new CreateAccountOperation(destination,amount))->setSourceAccount(m_account->getKeypair()->getAccountId()))
                 .addMemo(new MemoText(memo))
                 .setTimeout(10000)// we have to set a timeout
-                .setBaseFee(100)
+                .setBaseFee(100000)
                 .build();
         t->sign(m_account->getKeypair());
         SubmitTransactionResponse* response = server->submitTransaction(t);

@@ -68,6 +68,22 @@ ColumnLayout {
                                  memoField.text)
             }
         }
+        Button {
+            text: qsTr("Create")
+            enabled: destinationField.text !== "" && sourceWallet.funded && !sourceWallet.isWorking
+            visible: true
+            hoverEnabled: true
+            ToolTip.delay: 1000
+            ToolTip.timeout: 5000
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Tạo tài khoản")
+            onClicked: {
+                paymentGui.enabled = false // pay and create if fails, it emit error and invokes onError synchronized, so we have to disable it before.
+                //signals and slots are invoked in the same moment if the objects live in the same thread and you don't defer the signal by using a timer.
+                sourceWallet.create(destinationField.text, amountField.text,
+                                 memoField.text)
+            }
+        }
     }
 
     RowLayout {

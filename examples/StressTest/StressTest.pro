@@ -9,9 +9,9 @@ DEFINES += STELLAR_QT_REPLY_TIMEOUT=30000
 DEFINES *= ED25519_NO_SEED
 
 DEFINES += STELLAR_QT_SDK_CLIENT_NAME=\"\\\"qtcpp-stellar-sdk\\\"\"
-DEFINES += STELLAR_QT_SDK_CLIENT_VERSION=\"\\\"0.3.6\\\"\"
+DEFINES += STELLAR_QT_SDK_CLIENT_VERSION=\"\\\"0.3.17\\\"\"
 
-#include($$PWD/../../StellarQtSDK.pri)
+include($$PWD/../../StellarQtSDK.pri)
 
 INCLUDEPATH *=  $$PWD/../../
 INCLUDEPATH *=  $$PWD/../../src/
@@ -90,5 +90,5 @@ RESOURCES += \
 DESTDIR = ../../bin/
 target.path = $$DESTDIR
 LIBS += -L$$DESTDIR
-LIBS += -lStellarQtSDK
+#LIBS += -lStellarQtSDK
 

@@ -1,6 +1,6 @@
 #include "network.h"
 
-const QString Network::PUBLIC = "Public Global Stellar Network ; September 2015";
+const QString Network::PUBLIC = "Pi Network";
 const QString Network::TESTNET = "Pi Testnet";
 
 Network* Network::s_current = 0;

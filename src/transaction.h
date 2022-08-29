@@ -106,7 +106,7 @@ public:
          static quint32 s_defaultOperationFee;
         void clear();
      public:
-        static const quint32 BASE_FEE = 100;
+        static const quint32 BASE_FEE = 100000;
         static const qint64 TIMEOUT_INFINITE = 0;
          /**
         * Construct a new transaction builder.

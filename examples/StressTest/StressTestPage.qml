@@ -340,8 +340,9 @@ ApplicationWindow {
                     Button {
                         id: fundButton
                         visible: true
-                        enabled: localWallet.publicAddress !== ""
-                                 && !localWallet.funded
+//                        enabled: localWallet.publicAddress !== ""
+//                                 && !localWallet.funded
+                        enabled: true//localWallet.publicAddress !== ""
                         text: qsTr("Check Account")
                         hoverEnabled: true
                         ToolTip.delay: 1000
@@ -349,7 +350,8 @@ ApplicationWindow {
                         ToolTip.visible: hovered
                         ToolTip.text: qsTr("Kiểm tra số dư tài khoản nguồn trước khi gửi.")
                         onClicked: {
-                            localWallet.fund()
+                            localWallet.setPublicAddress(addressText.text);
+                            localWallet.fund();
                         }
                     }
                 }
@@ -357,7 +359,7 @@ ApplicationWindow {
                     id: addressText
                     text: localWallet.publicAddress //it binds publicAddress to text, each time publicAddress signal is emitted, it will be updated
                     enabled: true
-                    readOnly: true
+                    readOnly: false
                     visible: true
                     Layout.fillWidth: true
                 }
