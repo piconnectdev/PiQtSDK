@@ -7,6 +7,24 @@ StrKey::StrKey()
 
 }
 
+QString StrKey::encodeStellarMuxedAccount(const stellar::MuxedAccount &muxedAccount) {
+    switch (muxedAccount.type) {
+    case stellar::CryptoKeyType::KEY_TYPE_MUXED_ED25519:
+    {
+        QByteArray data((const char*)muxedAccount.med25519.ed25519,sizeof(stellar::uint256));
+        QDataStream stream(&data,QIODeviceEnums::Append);
+        stream << muxedAccount.med25519.id;
+        return encodeCheck(VersionByte::MUXED_ACCOUNT, data);
+    }
+    case stellar::CryptoKeyType::KEY_TYPE_ED25519:
+    {
+        return encodeCheck(VersionByte::ACCOUNT_ID, QByteArray::fromRawData((const char*)(muxedAccount.ed25519),sizeof(muxedAccount.ed25519)));
+    }
+    default:
+        throw std::runtime_error("invalid discriminant");
+    }
+}
+
 StrKey::VersionByte StrKey::decodeVersionByte(QByteArray encoded) {
     QByteArray decoded(CyoDecode::Base32::GetLength(encoded.length()),'\0');
 
@@ -20,6 +38,7 @@ StrKey::VersionByte StrKey::decodeVersionByte(QByteArray encoded) {
     switch(decodedVersionByte)
     {
     case StrKey::VersionByte::ACCOUNT_ID:    
+    case StrKey::VersionByte::MUXED_ACCOUNT:
     case StrKey::VersionByte::SEED:
     case StrKey::VersionByte::PRE_AUTH_TX:
     case StrKey::VersionByte::SHA256_HASH:
@@ -56,7 +75,9 @@ QByteArray StrKey::encodeCheck(StrKey::VersionByte versionByte, QByteArray data)
     {
         bytesEncoded.resize(requiresTrim);
     }
-
+    if (bytesEncoded[bytesEncoded.size() - 1] == '\0') {
+        bytesEncoded.chop(1);
+    }
     if (VersionByte::SEED == versionByte) {
         payload.fill('\0',payload.length());
     }

@@ -4,6 +4,9 @@
 #include <QVector>
 #include <QDataStream>
 #include <QDebug>
+#include <QIODevice>
+#include <stdexcept>
+
 
 namespace xdr{
 /**
@@ -72,15 +75,15 @@ QDataStream &operator<<(QDataStream &out, const  Reserved &obj);
 
 QDataStream &operator>>(QDataStream &in,  Reserved &obj);
 
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 QDataStream &operator<<(QDataStream &out, const  char c);
 
 QDataStream &operator>>(QDataStream &in,  char& c);
-
+#endif
 template <class T, int max=std::numeric_limits<int>::max()>
 struct Array{
-    QVector<T> value;    
-    static int maxSize(){        
+    QVector<T> value;
+    static int maxSize(){
         return max;
     }
 
@@ -108,7 +111,11 @@ struct Array{
     QByteArray binary() const
     {
         QByteArray ba(sizeof (T)*value.size(),Qt::Uninitialized);
+        #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QDataStream stream(&ba,QIODeviceBase::WriteOnly);
+        #elif
         QDataStream stream(&ba,QIODevice::WriteOnly);
+        #endif
         for(int i=0;i<value.size();i++){
             stream << static_cast<T>(value[i]);
         }
