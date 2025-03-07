@@ -21,8 +21,8 @@ class Wallet : public QObject
     Q_PROPERTY(QString lastDestination MEMBER _lastDestination NOTIFY stateChanged)
     Q_PROPERTY(StellarGateway *gateway MEMBER m_gateway NOTIFY gatewayChanged)
 
-    StellarGateway * m_gateway;
-    Account *m_account;
+    StellarGateway * m_gateway = nullptr;
+    Account *m_account = nullptr;
     QString m_balance;
 
 

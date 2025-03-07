@@ -108,7 +108,7 @@ void Wallet::claim()
                         Predicate::AbsBefore* bef = (Predicate::AbsBefore*)&pre->getInner();
                         qDebug() << bef->getTimestampSeconds();
                         if (QDateTime::currentSecsSinceEpoch() > bef->getTimestampSeconds()-10) {
-                            Transaction *t = Transaction::Builder(m_account)
+                            Transaction *t = Transaction::Builder(AccountConverter().enableMuxed(), m_account)
                                     .addOperation((new ClaimClaimableBalanceOperation(clm->getID()))->setSourceAccount(m_account->getKeypair()->getAccountId()))
                                     //.addMemo(new MemoText(memo))
                                     .setTimeout(10000)// we have to set a timeout
@@ -159,7 +159,7 @@ void Wallet::pay(QString destination, QString amount, QString memo)
         qDebug()<< QDateTime::currentDateTimeUtc().toLocalTime().toString(Qt::ISODateWithMs) << " StartPay " << destination ;
         Server *server= m_gateway->server();
 
-        Transaction *t = Transaction::Builder(m_account)
+        Transaction *t = Transaction::Builder(AccountConverter().enableMuxed(), m_account)
                 .addOperation(new PaymentOperation(destination,new AssetTypeNative(),amount))
                 .addMemo(new MemoText(memo))
                 .setTimeout(10000)// we have to set a timeout
@@ -240,7 +240,7 @@ void Wallet::create(QString destination, QString amount, QString memo)
 
         Server *server= m_gateway->server();
 
-        Transaction *t = Transaction::Builder(m_account)
+        Transaction *t = Transaction::Builder(AccountConverter().enableMuxed(), m_account)
                 .addOperation((new CreateAccountOperation(destination,amount))->setSourceAccount(m_account->getKeypair()->getAccountId()))
                 .addMemo(new MemoText(memo))
                 .setTimeout(10000)// we have to set a timeout
@@ -261,8 +261,10 @@ void Wallet::create(QString destination, QString amount, QString memo)
 void Wallet::setPublicAddress(QString publicAddress)
 {
     //if is the same, we don't modify anything
-    if(m_account && m_account->getKeypair()->getAccountId()==publicAddress)
+    if(m_account && m_account->getKeypair()->getAccountId()==publicAddress) {
+        update();
         return;
+    }
     //if it changed, we delete it
     if(m_account)
         delete m_account;

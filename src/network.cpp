@@ -1,7 +1,7 @@
 #include "network.h"
 
-const QString Network::PUBLIC = "Pi Network";
-const QString Network::TESTNET = "Pi Testnet";
+const QString Network::PUBLIC_S = "Pi Network";
+const QString Network::TESTNET_S = "Pi Testnet";
 
 Network* Network::s_current = 0;
 
